@@ -1,0 +1,7 @@
+とる take
+みなやる map
+みなたす sum
+つぎ succ
+おう max
+すす min
+わる div
