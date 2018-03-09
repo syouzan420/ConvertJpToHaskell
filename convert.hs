@@ -24,8 +24,10 @@ justFitlist cl x = [y | y <- cl, (fst y)==x]
 -- 4たす といふ文字列は (+ 4)と變換される！
 convert :: [(String, String)] -> String -> String
 convert cl x 
+    | ((fitlist cl x)==[]) && ((last x)=='は') = (init x)++" = "
     | (fitlist cl x)==[] = x
     | (justFitlist cl x)/=[] = (snd $ head (justFitlist cl x))
+    | (last x)=='は' = (init (snd $ head (fitlist cl x)))++" = "
     | otherwise = changePosition cl (fst $ head (fitlist cl x)) x []
 
 -- これは 與へられた文字列(x:xs) に對して wといふ共通部分があれば
@@ -43,7 +45,7 @@ changePosition cl w (x:xs) li
 -- これを行に分け さらに單語に分けて その單語をconvertで變換し
 -- 單語をつないで文にし それを複数行つなげて 文章全體に戻す
 convertAll :: String -> [(String, String)] -> String
-convertAll con cl= unlines $ map unwords $ map (map (convert cl)) (map words $ lines con)
+convertAll con cl= unlines $ map unwords $ map (map (convert cl)) (map words' $ lines con)
 
 -- fname1 はソース元のファイル名である
 -- fname2 は變換ごのファイル名であり 末尾は.hsとしたい
@@ -59,6 +61,7 @@ convertText fname1 fname2 cl = do
     let con = topText ++ co
     hSetEncoding hout utf8
     hPutStr hout (convertAll con cl) 
+    print (map words' $ lines co)
     hClose hin
     hClose hout
 
@@ -81,6 +84,20 @@ readConverter fname fname1 fname2 = do
 -- ふたつの要素でなくとも動くが 今回變換したいものは 要素がふたつに限る
 makeTupple :: [String] -> (String, String)
 makeTupple l = (head l, head $ tail l)
+
+-- 以下の二つの函數は words 函數が
+-- 行の冒頭にあるスペースをすべて省いてしまふ
+-- といふ問題を解決するためつくられた
+tabAdd :: String -> String -> [String]
+tabAdd s (x:xs)
+      | x==' ' = tabAdd (s++" ") xs
+      | s=="" = words (x:xs)
+      | otherwise = s:(words (x:xs)) 
+
+words' :: String -> [String]
+words' w
+      |w=="" = []
+      |otherwise = tabAdd "" w 
 
 -- 書き込むファイルの先頭に加へる文章
 -- import文を加へて 新たに定義した函數が使へるやうにする
