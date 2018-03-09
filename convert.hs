@@ -64,7 +64,7 @@ makeTupple l = (head l, head $ tail l)
 -- 書き込むファイルの先頭に加へる文章
 -- import文を加へて 新たに定義した函數が使へるやうにする
 topText :: String
-topText = "import newFunc\n\n"
+topText = "import NewFunc\n\n"
 
 -- コマンド引數をふたつ(ファイル名)とり
 -- readConverter を實行するのみ これがメイン函數となる
@@ -73,18 +73,3 @@ main = do
     [fname1, fname2] <- getArgs
     readConverter "converter.txt" fname1 fname2
 
---以前に書いたものを ここにまとめる
---
---convert :: String -> String
---convert x 
---    | x=="とる" = "take"
---    | x=="みなやる" = "map"
---    | x=="みなたす" = "sum"
---    | x=="`あまり`" = "`mod`"
---    | otherwise = x
---
---convertAll :: String -> String
---convertAll x = unlines (map unwords (map (map convert) (map words (lines x))))
---
---convertList = [("とる","take"),("みなやる","map"),("みなたす","sum"),
---              ("つぎ","succ"),("おう","max"),("すす","min"),("わる","div")]
