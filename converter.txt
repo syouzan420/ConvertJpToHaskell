@@ -11,3 +11,8 @@
 かける *
 たし +
 たす +
+はじめに main=
+つぎをする main=do
+する do
+だす print
+かく putStrLn

@@ -37,6 +37,7 @@ convert cl x
 changePosition :: [(String,String)] -> String -> String -> String ->String
 changePosition cl w (x:xs) li
     | xs==[] = (x:xs)
+    | xs==w && x=='を' = (snd $ head (fitlist cl w))++[' ']++li
     | xs==w = ['(']++(snd $ head (fitlist cl w))++[' ']++li++[x]++[')']
     | otherwise = changePosition cl w xs (li++[x])
 
