@@ -27,14 +27,15 @@ convertAll con cl= unlines $ map unwords $ map (map (convert cl)) (map words $ l
 -- fname1 はソース元のファイル名である
 -- fname2 は變換ごのファイル名であり 末尾は.hsとしたい
 -- 引數clは convertAll へ引きついでゐるもので ConvertListのことだ
--- ソースファイルを開いて内容をconといふ變數に読みこみ
--- convertALlでconを變換したものをfname2の方へ書きこんでゐる
+-- ソースファイルを開いて内容をcoといふ變數に読みこみ
+-- convertALlでcoを變換したものの先頭に topText を加へてfname2の方へ書きこんでゐる
 convertText :: FilePath -> FilePath -> [(String, String)] -> IO ()
 convertText fname1 fname2 cl = do
     hin <- openFile fname1 ReadMode
     hout <- openFile fname2 WriteMode
     hSetEncoding hin utf8
-    con <- hGetContents hin
+    co <- hGetContents hin
+    let con = topText ++ co
     hSetEncoding hout utf8
     hPutStr hout (convertAll con cl) 
     hClose hin
@@ -59,6 +60,11 @@ readConverter fname fname1 fname2 = do
 -- ふたつの要素でなくとも動くが 今回變換したいものは 要素がふたつに限る
 makeTupple :: [String] -> (String, String)
 makeTupple l = (head l, head $ tail l)
+
+-- 書き込むファイルの先頭に加へる文章
+-- import文を加へて 新たに定義した函數が使へるやうにする
+topText :: String
+topText = "import newFunc\n\n"
 
 -- コマンド引數をふたつ(ファイル名)とり
 -- readConverter を實行するのみ これがメイン函數となる
