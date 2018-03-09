@@ -1,7 +1,6 @@
 import System.Environment (getArgs)
 import Data.List (isInfixOf)
 import System.IO (IOMode(..), openFile, hClose, hGetContents, hSetEncoding, utf8, hPutStr)
--- import CoreFunc
 
 -- ConvertList(cl) はタプルを要素とするリストである
 -- x といふ文字列が タプルの第一要素に含まれてゐれば
