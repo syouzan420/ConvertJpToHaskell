@@ -1,21 +1,43 @@
 import System.Environment (getArgs)
-import System.IO
+import Data.List (isInfixOf)
+import System.IO (IOMode(..), openFile, hClose, hGetContents, hSetEncoding, utf8, hPutStr)
+-- import CoreFunc
 
 -- ConvertList(cl) はタプルを要素とするリストである
--- x といふ文字列が タプルの第一要素に合致すれば
+-- x といふ文字列が タプルの第一要素に含まれてゐれば
 -- そのタプルを要素としたリストを返す
--- このリストは要素数0もしくは1となる筈である
 fitlist :: [(String,String)] -> String -> [(String, String)]
-fitlist cl x = [y | y <- cl, (fst y)==x]
+fitlist cl x = [y | y <- cl, (fst y) `isInfixOf` x]
+
+-- これはfitlistとほぼ同じだが
+-- x がタプルの第一要素に完全一致する場合のものだ
+justFitlist :: [(String,String)] -> String -> [(String, String)]
+justFitlist cl x = [y | y <- cl, (fst y)==x]
 
 -- 第一引數は fitlistへの引きわたしのためにある
--- 文字列を與へたとき それが ConvertListにあれば タプルの第二要素が返る
--- なければ fitlist の結果は空リストなので その時は 文字列をそのまま返す
+-- まづ x が 用意した文字列の一部にも該当しない場合 x をそのまま返す
+-- x が 用意した文字列のどれかに 完全一致するとき
+-- 完全一致したタプルの第二要素(變換した文字列)を返す
+-- さうでなければ x が用意した文字列に一致した部分を變換し
+-- その前についてゐる文字列(これは 函數の引數にあたる)を 變換後のxの後ろへ
+-- もってくる changePositionなる函數を適用する
+-- 例へば 用意したタプルが("たす","+")であった場合
+-- 4たす といふ文字列は (+ 4)と變換される！
 convert :: [(String, String)] -> String -> String
-convert cl x =
-    if (fitlist cl x)==[]
-      then x
-      else snd $ head (fitlist cl x)
+convert cl x 
+    | (fitlist cl x)==[] = x
+    | (justFitlist cl x)/=[] = (snd $ head (justFitlist cl x))
+    | otherwise = changePosition cl (fst $ head (fitlist cl x)) x []
+
+-- これは 與へられた文字列(x:xs) に對して wといふ共通部分があれば
+-- それを cl で示された變換法則に從つて變換し 共通部分の前にあった文字列を
+-- 變換した文字列の後に 空白を挿入しながら配置し その全部を括弧でくくる
+-- といふことをする函數である
+changePosition :: [(String,String)] -> String -> String -> String ->String
+changePosition cl w (x:xs) li
+    | xs==[] = (x:xs)
+    | xs==w = ['(']++(snd $ head (fitlist cl w))++[' ']++li++[x]++[')']
+    | otherwise = changePosition cl w xs (li++[x])
 
 -- 第二引數は cl をconvert へ引き繼がせてゐる
 -- conといふ第一引數は ファイル中の全文字列である
