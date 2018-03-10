@@ -37,16 +37,34 @@ convert cl x
 changePosition :: [(String,String)] -> String -> String -> String ->String
 changePosition cl w (x:xs) li
     | xs==[] = (x:xs)
-    | xs==w && x=='を' = (snd $ head (fitlist cl w))++[' ']++li
+    | xs==w && x=='を' = ['(']++(snd $ head (fitlist cl w))++[' ']++li++[')']
     | xs==w = ['(']++(snd $ head (fitlist cl w))++[' ']++li++[x]++[')']
     | otherwise = changePosition cl w xs (li++[x])
+
+-- ここでは "を"の処理をしてゐる 例へば
+-- 「なにか を する」 「なにかを する」 「なにか をする」
+-- 以上のすべてが
+-- 「なにかをする」と ひとつのまとまりでリストに加へられる
+joinWords :: [String] -> [String] -> [String]
+joinWords li [] = li 
+joinWords li (x:xs)
+    | xs==[] = (li++[x])
+    | (head $ head xs)=='を' && (tail $ head xs)==[] && (tail xs)==[] = li++[x++"を"]
+    | (head $ head xs)=='を' && (tail $ head xs)==[]
+                             = joinWords (li++[x++"を"++(head $ tail xs)]) (tail $ tail xs) 
+    | (head $ head xs)=='を' = joinWords (li++[x++(head xs)]) (tail xs) 
+    | (last x)=='を' && (init x)/=[] && xs/=[] = joinWords (li++[x++(head xs)]) (tail xs)
+    | otherwise = joinWords (li++[x]) xs 
+
+joinWords' :: [String] -> [String]
+joinWords' x = joinWords [] x
 
 -- 第二引數は cl をconvert へ引き繼がせてゐる
 -- conといふ第一引數は ファイル中の全文字列である
 -- これを行に分け さらに單語に分けて その單語をconvertで變換し
 -- 單語をつないで文にし それを複数行つなげて 文章全體に戻す
 convertAll :: String -> [(String, String)] -> String
-convertAll con cl= unlines $ map unwords $ map (map (convert cl)) (map words' $ lines con)
+convertAll con cl= unlines $ map unwords $ map (map (convert cl)) (map (joinWords' . words') $ lines con)
 
 -- fname1 はソース元のファイル名である
 -- fname2 は變換ごのファイル名であり 末尾は.hsとしたい
@@ -84,7 +102,7 @@ readConverter fname fname1 fname2 = do
 -- ふたつの要素よりなる文字列リストをタプルに變換する函數
 -- ふたつの要素でなくとも動くが 今回變換したいものは 要素がふたつに限る
 makeTupple :: [String] -> (String, String)
-makeTupple l = (head l, head $ tail l)
+makeTupple l = (head l, unwords $ tail l)
 
 -- 以下の二つの函數は words 函數が
 -- 行の冒頭にあるスペースをすべて省いてしまふ
