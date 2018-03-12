@@ -1,9 +1,6 @@
 とる take
 みなやる map
 みなたす sum
-つぎ succ
-おう max
-すす min
 わる div
 のすべてに `map'`
 そのすべてに `map'`
@@ -11,6 +8,9 @@
 かける *
 たし +
 たす +
+つぎ succ
+まへ pred
+まえ pred
 はじめに main =
 つぎをする main = do
 する do

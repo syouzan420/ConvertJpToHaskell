@@ -24,22 +24,39 @@ justFitlist cl x = [y | y <- cl, (fst y)==x]
 -- 4たす といふ文字列は (+ 4)と變換される！
 convert :: [(String, String)] -> String -> String
 convert cl x 
-    | ((fitlist cl x)==[]) && ((last x)=='は') = (init x)++" = "
-    | (fitlist cl x)==[] = x
     | (justFitlist cl x)/=[] = (snd $ head (justFitlist cl x))
+    | ((fitlist cl x)==[]) && ((last x)=='は') = (init x)++" = "
+    | (fitlist cl x)==[] = x 
+    | (head $ fst $ head (fitlist cl x))=='の'
+                             = splitAndChange cl [] (fst $ head (fitlist cl x)) x
     | (last x)=='は' = (init (snd $ head (fitlist cl x)))++" = "
-    | otherwise = changePosition cl (fst $ head (fitlist cl x)) x []
+    | otherwise = changePosition cl [] (fst $ head (fitlist cl x)) x 
 
 -- これは 與へられた文字列(x:xs) に對して wといふ共通部分があれば
 -- それを cl で示された變換法則に從つて變換し 共通部分の前にあった文字列を
 -- 變換した文字列の後に 空白を挿入しながら配置し その全部を括弧でくくる
 -- といふことをする函數である
 changePosition :: [(String,String)] -> String -> String -> String ->String
-changePosition cl w (x:xs) li
-    | xs==[] = (x:xs)
+changePosition cl li w [] = li
+changePosition cl li w (x:xs) 
+    | xs==[] = (li++[x])
+    | x=='の' && (take 2 xs)=="つぎ"
+             = changePosition cl (['(']++"succ"++[' ']++li++[')']) w (drop 2 xs)
+    | x=='の' && ((take 2 xs)=="まへ" || (take 2 xs)=="まえ")
+             = changePosition cl (['(']++"pred"++[' ']++li++[')']) w (drop 2 xs)
     | xs==w && x=='を' = ['(']++(snd $ head (fitlist cl w))++[' ']++li++[')']
     | xs==w = ['(']++(snd $ head (fitlist cl w))++[' ']++li++[x]++[')']
-    | otherwise = changePosition cl w xs (li++[x])
+    | otherwise = changePosition cl (li++[x]) w xs
+
+-- これは 上のchangePosition の やうに單語の配置を變へず
+-- 單語變換されない部分を前に殘し スペースを入れて
+-- 單語變換した部分をつけ加へてゐる
+splitAndChange :: [(String,String)] -> String -> String -> String -> String
+splitAndChange cl li w [] = li
+splitAndChange cl li w (x:xs)
+    | xs==[] = (x:xs)
+    | xs==w = (li++[x]++[' ']++(snd $ head (fitlist cl w)))
+    | otherwise = splitAndChange cl (li++[x]) w xs
 
 -- ここでは "を"の処理をしてゐる 例へば
 -- 「なにか を する」 「なにかを する」 「なにか をする」
@@ -54,10 +71,24 @@ joinWords li (x:xs)
                              = joinWords (li++[x++"を"++(head $ tail xs)]) (tail $ tail xs) 
     | (head $ head xs)=='を' = joinWords (li++[x++(head xs)]) (tail xs) 
     | (last x)=='を' && (init x)/=[] && xs/=[] = joinWords (li++[x++(head xs)]) (tail xs)
+    | (head $ head xs)=='の' && (tail $ head xs)==[] && (tail xs)==[] = li++[x++"の"]
+    | (head $ head xs)=='の' || ((last x)=='の' && (init x)/=[] && xs/=[])
+               = joinWords (li++[(fst (checkLetter x xs))]) (snd (checkLetter x xs))
     | otherwise = joinWords (li++[x]) xs 
 
 joinWords' :: [String] -> [String]
 joinWords' x = joinWords [] x
+
+-- これは今のところ 「の」のためにつくられた
+-- スペースで区切られた「の」を 全部一緒の文字列にまとめる函數である
+checkLetter :: String -> [String] -> (String, [String])
+checkLetter st [] = (st,[])
+checkLetter st (x:xs)
+    | xs==[] = ((st++x), [])
+    | (last x)=='の' = checkLetter (st++x) (xs)
+    | (head $ head xs)=='の' = checkLetter (st++x) (xs)
+    | otherwise = ((st++x), xs)
+
 
 -- 第二引數は cl をconvert へ引き繼がせてゐる
 -- conといふ第一引數は ファイル中の全文字列である
