@@ -1,3 +1,6 @@
+はじめ = main
+つぎをする = do
+a をだす = print a
 a のそれぞれに b = map b a
 a と b のおおきいはう = max a b
 a に b = b a

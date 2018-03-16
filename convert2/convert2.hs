@@ -4,7 +4,7 @@ import Data.List.Split (splitOn)
 import Data.List (isInfixOf, isSuffixOf)
 
 topText :: String
-topText = "import NewFunc\n\n"
+topText = "-- test.hs  Japanese to Haskell test code\n\n"
 
 -- convert test for ghci
 ct :: IO()
@@ -51,6 +51,8 @@ makeString tps [] [] = []
 makeString tps [] t = []
 makeString tps (x:xs) t 
   | x>="a" && x<="z" && (length x)==1 = (convertString tps tps (searchFrom t x))++(makeString tps xs t)
+  | x=="main" = "main"
+  | x=="do" = "do"
   | otherwise = "("++x++" "++(makeString tps xs t)++") "
 
 searchFrom :: [(String, String)] -> String -> String
@@ -76,6 +78,7 @@ matchKeys st [] = [st]
 matchKeys st (x:xs)
     | x==[] = [st]
     | st==[] = [] 
+    | ((length st) - (length x))==0 = []
     | x `isSuffixOf` st = [take ((length st) - (length x)) st]
     | (head $ splitOn x st)==st = [st]
     | otherwise = (init $ splitOn x st)++(matchKeys (last $ splitOn x st) xs )
