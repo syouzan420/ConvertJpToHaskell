@@ -6,9 +6,9 @@ import NewFunc
 ((*) 4) 3
 (succ (succ (succ (succ 3) ) ) ) 
 ((*) (succ (succ (succ (succ 3) ) ) ) ) 
-((*) (max (succ 3) (pred 6) ) ) 5
-((*) (succ 3) ) 
-((*) (pred 6) ) (succ 3) 
-((*) (max (succ 3) (pred 6) ) ) 
-(max (succ 3) (pred 6) ) 
-(pred (pred (succ (succ (pred (succ 5) ) ) ) ) ) 
+ごりら = ((*) (max (succ 3) (pred 6) ) ) 5
+    らいおん = ((*) (succ 3) ) 
+abc = ((*) (pred 6) ) (succ 3) 
+あいう = ((*) (max (succ 3) (pred 6) ) ) 
+テスト = (max (succ 3) (pred 6) ) 
+すごいやつ = (pred (pred (succ (succ (pred (succ 5) ) ) ) ) ) 

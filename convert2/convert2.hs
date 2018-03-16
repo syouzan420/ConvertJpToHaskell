@@ -15,7 +15,15 @@ joinWords [] = []
 joinWords (x:xs) = (x++(joinWords xs))
 
 convertAll :: [(String, String)] -> String -> String
-convertAll tps co = unlines $ map (convertString tps tps) $ map (joinWords . words) (lines co)
+convertAll tps co = unlines $ map (joinWords . (convertLine tps) . makeSentences) (lines co)
+
+convertLine :: [(String, String)] -> [String] -> [String]
+convertLine tps [] = []
+convertLine tps (x:xs)
+    | (filter (/=' ') x)==[] = ([x]++(convertLine tps xs))
+    | x=="=" = ([" = "]++(convertLine tps xs))
+    | x=="は " = ([" = "]++(convertLine tps xs))
+    | otherwise = [(convertString tps tps) $ joinWords $ words x]++(convertLine tps xs)
 
 convertString :: [(String, String)] -> [(String, String)] -> String -> String
 convertString tps [] [] = []
@@ -105,6 +113,28 @@ makeHText fname1 fname2 tps = do
 makeTupple :: String -> (String, String)
 makeTupple [] = ([],[])
 makeTupple ln = (head (splitOn " = " ln ) , last (splitOn " = " ln))
+
+addStringToList :: String -> String -> [String]
+addStringToList s (x:xs)
+      | x==' ' = addStringToList (s++" ") xs
+      | s=="" && ("は " `isInfixOf` (x:xs)) = stringInto "は " (x:xs)
+      | s=="" && ("=" `isInfixOf` (x:xs)) = stringInto "=" (x:xs)
+      | s=="" = [(x:xs)]
+      | otherwise = s:(addStringToList "" (x:xs))
+
+makeSentences :: String -> [String]
+makeSentences w
+      |w=="" = []
+      |otherwise = addStringToList "" w 
+
+stringInto :: String -> String -> [String]
+stringInto x y = (listInto x) $ splitOn x y
+
+listInto :: String -> [String] -> [String]
+listInto x [] = []
+listInto x (y:ys)
+    | ys /= [] = [y]++[x]++(listInto x ys)
+    | otherwise = [y]
 
 convert :: FilePath -> FilePath -> IO () 
 convert fname1 fname2 = do
