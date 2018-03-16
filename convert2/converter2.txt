@@ -1,0 +1,6 @@
+a のそれぞれに b = map b a
+a と b のおおきいはう = max a b
+a に b = b a
+a をかける = (*) a
+a のつぎ = succ a
+a のまへ = pred a
