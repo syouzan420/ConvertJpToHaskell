@@ -50,10 +50,10 @@ makeString [] [] [] = []
 makeString tps [] [] = []
 makeString tps [] t = []
 makeString tps (x:xs) t 
-  | x>="a" && x<="z" && (length x)==1 = (convertString tps tps (searchFrom t x))++(makeString tps xs t)
-  | x=="main" = "main"
-  | x=="do" = "do"
-  | otherwise = "("++x++" "++(makeString tps xs t)++") "
+  | x>="a" && x<="z" && (length x)==1 = " "++(convertString tps tps (searchFrom t x))++(makeString tps xs t)
+  | x=="main" || x=="do" = x
+  | x=="(" || x==")" = x++(makeString tps xs t) 
+  | otherwise = "("++x++(makeString tps xs t)++")"
 
 searchFrom :: [(String, String)] -> String -> String
 searchFrom [] s = []
