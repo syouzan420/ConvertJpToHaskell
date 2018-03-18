@@ -9,6 +9,7 @@ abc = ( (* (pred 6)) (succ 3))
 すごいやつ = (pred (pred (succ (succ (pred (succ 5))))))
 a = ( (`div` 2) 5)
 b =  (+ 10) ( (* 5) 3)
+c = 3*5+10
 
 main = do
   (print teru)
