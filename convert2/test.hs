@@ -10,6 +10,10 @@ abc = ( (* (pred 6)) (succ 3))
 a = ( (`div` 2) 5)
 b =  (+ 10) ( (* 5) 3)
 c = 3*5+10
+d = (map ( (+ 5). (* 4)) [3..10])
+ex = if x>10
+      then 100
+      else 200
 
 main = do
   (print teru)

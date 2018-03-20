@@ -1,9 +1,13 @@
 はじめ = main
 つぎをする = do
+もし a = if a
+ならば a = then a
+でないと a = else a
 a のそれぞれに b = map b a
 a それに b = b a 
 a をだす = print a
 a と b のおおきいはう = max a b
+a て b = ( b . a )
 a に b = ( b a )
 a をかける = * a 
 a をかけ = * a

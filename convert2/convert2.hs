@@ -17,6 +17,8 @@ joinWords (x:xs) = (x++(joinWords xs))
 convertAll :: [(String, String)] -> String -> String
 convertAll tps co = unlines $ map (joinWords . (convertLine tps) . makeSentences) (lines co)
 
+-- [("a のそれぞれに b","map b a")...] -> ["
+-- ","d","=","[1,3,4]のそれぞれに..."] -> コンバートしたもの 
 convertLine :: [(String, String)] -> [String] -> [String]
 convertLine tps [] = []
 convertLine tps (x:xs)
@@ -36,15 +38,16 @@ convertString tps (x:xs) st
              then if ((length (matchKeys st (getVerbList x)))==(length (getObjectList x)))
                      then (makeString (tps) (words $ snd x)
                            (twoListToTupple (getObjectList x) (matchKeys st (getVerbList x))))
-                     else convertString tps xs st 
+                     else st 
              else convertString tps xs st 
     | ((last $ getVerbList x) `isSuffixOf` st)
         = if ((length (matchKeys st (getVerbList x)))==(length (getObjectList x)))
              then (makeString (tps) (words $ snd x)
                       (twoListToTupple (getObjectList x) (matchKeys st (getVerbList x))))
-             else convertString tps xs st 
+             else st 
     | otherwise = convertString tps xs st 
 
+-- tps -> ["max","a","b"] -> [("a","3"),("b","5")] -> "(max 3 5) 
 makeString :: [(String, String)] -> [String] -> [(String, String)] -> String
 makeString [] [] [] = []
 makeString tps [] [] = []
@@ -52,7 +55,8 @@ makeString tps [] t = []
 makeString tps (x:xs) t 
   | x>="a" && x<="z" && (length x)==1 = " "++(convertString tps tps (searchFrom t x))++(makeString tps xs t)
   | x=="main" || x=="do" = x
-  | x=="(" || x==")" = x++(makeString tps xs t) 
+  | x=="if" || x=="then" || x=="else" = x++(makeString tps xs t)
+  | x=="(" || x==")" || x=="." = x++(makeString tps xs t) 
   | otherwise = "("++x++(makeString tps xs t)++")"
 
 searchFrom :: [(String, String)] -> String -> String
@@ -81,6 +85,8 @@ matchKeys st (x:xs)
     | ((length st) - (length x))==0 = []
     | x `isSuffixOf` st = [take ((length st) - (length x)) st]
     | (head $ splitOn x st)==st = [st]
+    | (head $ splitOn x st)=="" =tail (splitOn x st)
+    | (last $ splitOn x st)=="" =splitOn x st
     | otherwise = (init $ splitOn x st)++(matchKeys (last $ splitOn x st) xs )
 
 -- "a のそれぞれに b" -> (["それぞれに"],["a","b"])
