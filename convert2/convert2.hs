@@ -21,10 +21,11 @@ convertAll tps co = unlines $ map (joinWords . (convertLine tps) . makeSentences
 -- ","d","=","[1,3,4]のそれぞれに..."] -> コンバートしたもの 
 convertLine :: [(String, String)] -> [String] -> [String]
 convertLine tps [] = []
-convertLine tps (x:xs)
+convertLine tps li@(x:xs)
     | (filter (/=' ') x)==[] = ([x]++(convertLine tps xs))
     | x=="=" = ([" = "]++(convertLine tps xs))
     | x=="は " = ([" = "]++(convertLine tps xs))
+    | (["="] `isInfixOf` li) || (["は "] `isInfixOf` li) = ([x]++(convertLine tps xs))
     | otherwise = [(convertString tps tps) $ joinWords $ words x]++(convertLine tps xs)
 
 convertString :: [(String, String)] -> [(String, String)] -> String -> String
