@@ -33,6 +33,7 @@ convertLine tps li@(x:xs)
     | (filter (/=' ') x)==[] = ([x]++(convertLine tps xs))
     | x=="=" = ([" = "]++(convertLine tps xs))
     | x=="は " = ([" = "]++(convertLine tps xs))
+    | x=="はじめ" = (["main"]++(convertLine tps xs))
     | (["="] `isInfixOf` li) || (["は "] `isInfixOf` li) = ([x]++(convertLine tps xs))
     | otherwise = [(convertString tps tps) $ joinWords $ words x]++(convertLine tps xs)
 
