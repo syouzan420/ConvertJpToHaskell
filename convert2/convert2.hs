@@ -12,7 +12,15 @@ ct = convert "test.txt" "test.hs"
 
 joinWords :: [String] -> String
 joinWords [] = []
-joinWords (x:xs) = (x++(joinWords xs))
+joinWords (x:xs)
+    | (head x)=='(' = (x++" "++(notJoinWords xs))
+    | otherwise = (x++(joinWords xs))
+
+notJoinWords :: [String] -> String
+notJoinWords [] = []
+notJoinWords (x:xs)
+    | (last x)==')' = (x++(joinWords xs))
+    | otherwise = (x++" "++(notJoinWords xs))
 
 convertAll :: [(String, String)] -> String -> String
 convertAll tps co = unlines $ map (joinWords . (convertLine tps) . makeSentences) (lines co)
@@ -125,12 +133,12 @@ makeTupple [] = ([],[])
 makeTupple ln = (head (splitOn " = " ln ) , last (splitOn " = " ln))
 
 addStringToList :: String -> String -> [String]
-addStringToList s (x:xs)
+addStringToList s li@(x:xs)
       | x==' ' = addStringToList (s++" ") xs
-      | s=="" && ("は " `isInfixOf` (x:xs)) = stringInto "は " (x:xs)
-      | s=="" && ("=" `isInfixOf` (x:xs)) = stringInto "=" (x:xs)
-      | s=="" = [(x:xs)]
-      | otherwise = s:(addStringToList "" (x:xs))
+      | s=="" && ("は " `isInfixOf` li) = stringInto "は " li 
+      | s=="" && ("=" `isInfixOf` li) = stringInto "=" li 
+      | s=="" = [li]
+      | otherwise = s:(addStringToList "" li)
 
 makeSentences :: String -> [String]
 makeSentences w
